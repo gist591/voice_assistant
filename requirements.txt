@@ -1,0 +1,6 @@
+fuzzywuzzy
+vosk
+wave
+torch
+sounddevice
+SpeechRecognition
