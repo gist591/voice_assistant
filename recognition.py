@@ -4,7 +4,7 @@ import json
 
 
 def use_recognition():
-    recognized_data = ''
+    recognized_data: str = ''
     try:
         wave_audio_file = wave.open('microphone-results.wav', 'rb')
         model = Model('./models/my_vosk_model')
