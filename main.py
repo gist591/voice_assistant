@@ -9,12 +9,13 @@ from threading import Event
 import torch
 import sounddevice as sd
 from queue import Queue
+from typing import Final
 
 queue = Queue()
 
 def record_and_recognize_audio(microphone, recognizer, *args: tuple):
 
-    recognized_data = ''
+    recognized_data: str = ''
     recognizer.adjust_for_ambient_noise(microphone, duration=5)
 
     try:
@@ -29,25 +30,25 @@ def record_and_recognize_audio(microphone, recognizer, *args: tuple):
 
     print('Осмысляю ваши слова...')
 
-    recognized_data = recognition.use_recognition()
+    recognized_data: str = recognition.use_recognition()
 
     queue.put(recognized_data)
 
 
 # TTS from https://www.silero.ai
 def speaker(text):
-    device = torch.device('cpu')
+    device: Final = torch.device('cpu')
     torch.set_num_threads(4)
-    local_file = './models/model.pt'
+    local_file: Final = './models/model.pt'
 
-    model = torch.package.PackageImporter(
+    model: Final = torch.package.PackageImporter(
         local_file).load_pickle('tts_models', 'model')
     model.to(device)
 
-    sample_rate = 48000
-    speaker = 'baya'
+    sample_rate: Final = 48000
+    speaker: Final = 'baya'
 
-    audio_paths = model.apply_tts(text=text,
+    audio_paths: Final = model.apply_tts(text=text,
                                   speaker=speaker,
                                   sample_rate=sample_rate)
 
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             th_record.start()
             th_record.join()
 
-            voice_input = queue.get()
+            voice_input: str = queue.get()
 
             if voice_input == '':
                 continue
