@@ -22,7 +22,7 @@ def init_config():
     terminal: Command = input('введите команду для вызова вашего терминала > ')
     manager: Command = input('введите команду для вызова вашего файлового менеджера > ')
     text_editor: Command = input('введите команду для вызова вашего текстового редактора/среды разработки > ')
-    settings: list = [browser, terminal, manager, text_editor]
+    settings: list[Command] = [browser, terminal, manager, text_editor]
 
     with open('config.pkl', 'wb+') as config:
         pickle.dump(settings, config)
