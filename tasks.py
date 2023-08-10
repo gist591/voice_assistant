@@ -9,39 +9,44 @@ import subprocess
 import re
 import time
 import pickle
+from typing import TypeAlias, Union
+
+
+Command: TypeAlias = str
+Seconds: TypeAlias = Union[float, str]
 
 try:
     with open('config.pkl', 'rb') as config:
-        settings = pickle.load(config)
+        settings: list[str] = pickle.load(config)
 except: Thread(target=main.speaker, args=('''кажется, вы не создали
  конфигурационный файл, запустите для этого файл инит точка пай''')).start()
 
 
-first_part_composite_combinations = ('а', 'прогноз')
-composite_combinations = ('а ещё', 'прогноз погоды')
+first_part_composite_combinations: tuple = ('а', 'прогноз')
+composite_combinations: tuple = ('а ещё', 'прогноз погоды')
 
 
 def composite_words(r, request):
-    index = request.index(r)
-    r1 = r + ' ' + request[index+1]
+    index: int = request.index(r)
+    r1: str = r + ' ' + request[index+1]
 
     return r1
 
 
 def pre_order_processing(voice_input):
-    several_commands_bool = 0
-    superfluous_words = ('мне', 'пожалуйста', 'можешь')
+    several_commands_bool: bool = 0
+    superfluous_words: tuple = ('мне', 'пожалуйста', 'можешь')
     args = voice_input.split(' ')
-    request = args.copy()
+    request: list = args.copy()
     for r in args:
         if r in first_part_composite_combinations:
-            r1 = composite_words(r, request)
+            r1: str = composite_words(r, request)
             if r1 in composite_combinations:
-                index = request.index(r)
+                index: int = request.index(r)
                 del request[index], request[index]
                 del args[index]
                 request.insert(index, r1)
-                r = r1
+                r: str = r1
         if r in ('а ещё', 'и'):
             several_commands_bool = 1
 
@@ -63,7 +68,7 @@ def parting(*args: list):
 
 
 def opening_program(*args: list, settings=settings):
-    list_software = {
+    list_software: dict[str, Command] = {
         'атом': settings[0],
         'терминал': settings[1],
         'менеджер': settings[2],
@@ -93,7 +98,7 @@ def search(*args: list):
         f'https://duckduckgo.com/?q={args}&ia=web')
 
 # (слова, которые вызывают команду) (команда) (ее нужно вызывать в отдельном потоке?)
-commands = {('привет', 'лиза', 'доброе утро', 'здравствуй'): (greetings, 0),
+commands: dict[tuple[str], tuple[function, bool] = {('привет', 'лиза', 'доброе утро', 'здравствуй'): (greetings, 0),
             ('пока', 'прощай', 'увидимся'): (parting, 0),
             ('прогноз'): (get_weather_forecast, 0),
             ('открой'): (opening_program, 1),
@@ -103,20 +108,20 @@ commands = {('привет', 'лиза', 'доброе утро', 'здравс�
 
 def timer(*args:list):
     print('timer')
-    digits = {'полминуты': 0.5 ,'одну': 1, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'восемь': 8, 'девять': 9, 'десять': 10, 'одиннадцать': 11, 'двенадцать': 12, 'тринадцать': 13, 'четырнадцать': 14, 'пятнадцать': 15, 'двадцать': 20, 'тридцать': 30, 'сорок': 40, 'шестьдесят': 60}
-    time_notation = {'секунд': 1, 'секунды': 1, 'минут': 60, 'минуты': 60, 'час': 3600, 'часов': 3600}
+    digits: dict[str, Seconds] = {'полминуты': 0.5 ,'одну': 1, 'две': 2, 'три': 3, 'четыре': 4, 'пять': 5, 'шесть': 6, 'семь': 7, 'восемь': 8, 'девять': 9, 'десять': 10, 'одиннадцать': 11, 'двенадцать': 12, 'тринадцать': 13, 'четырнадцать': 14, 'пятнадцать': 15, 'двадцать': 20, 'тридцать': 30, 'сорок': 40, 'шестьдесят': 60}
+    time_notation: dict[str, Seconds] = {'секунд': 1, 'секунды': 1, 'минут': 60, 'минуты': 60, 'час': 3600, 'часов': 3600}
     for arg in args:
         if arg in digits:
-            interval = digits.get(arg)
-            interval_word = arg
+            interval: Seconds = digits.get(arg)
+            interval_word: str = arg
         else:
             if arg in time_notation:
-                k = time_notation.get(arg)
-                k_word = arg
+                k: Seconds = time_notation.get(arg)
+                k_word: str = arg
             else:
-                k = 60
-                k_word = 'минут'
-    interval *= k
+                k: Seconds = 60
+                k_word: str = 'минут'
+    interval: Seconds *= k
 
     Thread(target=main.speaker(), args=(f'таймер заведен на {interval_word} {k_word}',)).start()
     time.sleep(interval)
@@ -125,8 +130,8 @@ def timer(*args:list):
 def several_commands(request: list):
     for r in request:
         if r in ('а ещё', 'и'):
-            request = ' '.join(request)
-            request = re.split('а ещё|\sи\s', request)
+            request: str = ' '.join(request)
+            request: list = re.split('а ещё|\sи\s', request)
 
             [request.insert(i, request.pop(i).split())
              for i in range(len(request))]
@@ -136,21 +141,21 @@ def several_commands(request: list):
 
 
 def execute_command_with_name(voice_input):
-    task_bool = 0
-    request, several_commands_bool = pre_order_processing(voice_input)
+    task_bool: bool = 0
+    request: list, several_commands_bool: bool = pre_order_processing(voice_input)
     if several_commands_bool == 1:
-        request = several_commands(request)
+        request: list = several_commands(request)
     else:
         request.insert(0, [request[i] for i in range(len(request))])
-        request = request[:1]
+        request: Command = request[:1]
 
     for r in request:
         for k in r:
             for key in commands.keys():
                 if fuzz.WRatio(k, key) > 85:
-                    last_command = key
+                    last_command: Command = key
                     r.remove(k)
-                    args = r
+                    args: list = r
 
                     print('key: '+str(key))
                     print('command: '+str(last_command))
@@ -163,7 +168,7 @@ def execute_command_with_name(voice_input):
                         th = Thread(target=commands[key][0], args=(args))
                         th.start()
 
-                    task_bool = 1
+                    task_bool: bool = 1
 
     if task_bool == 0:
         Thread(target=main.speaker, args=('я тебя не поняла',)).start()
