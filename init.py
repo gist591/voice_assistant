@@ -2,6 +2,7 @@ import pickle
 from main import speaker
 from threading import Thread
 import os
+from typing import TypeAlias
 
 detail_about_me = '''меня зовут
  Лиза. этот скрипт нацелен на определение некоторых индивидуальных настроек и
@@ -14,12 +15,14 @@ detail_about_me = '''меня зовут
  скором времени обрести широкий функционал и легкую настройку, однако на
  данный момент б+ольший акцент имеет работа над моей логикой.'''
 
+Command: TypeAlias = str
+
 def init_config():
-    browser = input('введите команду для вызова вашего браузера > ')
-    terminal = input('введите команду для вызова вашего терминала > ')
-    manager = input('введите команду для вызова вашего файлового менеджера > ')
-    text_editor = input('введите команду для вызова вашего текстового редактора/среды разработки > ')
-    settings = [browser, terminal, manager, text_editor]
+    browser: Command = input('введите команду для вызова вашего браузера > ')
+    terminal: Command = input('введите команду для вызова вашего терминала > ')
+    manager: Command = input('введите команду для вызова вашего файлового менеджера > ')
+    text_editor: Command = input('введите команду для вызова вашего текстового редактора/среды разработки > ')
+    settings: list = [browser, terminal, manager, text_editor]
 
     with open('config.pkl', 'wb+') as config:
         pickle.dump(settings, config)
